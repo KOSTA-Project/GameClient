@@ -45,6 +45,11 @@ namespace Client
             숫자 야구 관련 Form을 불러오자.
             */
 
+            //packet.setState("2");
+            //string msg = packet.makePacket();
+            //mysocket.Send(Encoding.Default.GetBytes(msg));
+
+
             // this.Visible =false;
             // Form lalaa = new Form();
             // lalaa.ShowDialog();
@@ -55,6 +60,11 @@ namespace Client
         {
 
             this.Visible = false;
+            // Word 게임 선택했다고 보내주기.
+            //packet.setState("1");
+            //string msg = packet.makePacket();
+            //mysocket.Send(Encoding.Default.GetBytes(msg));
+
            // WordGame wordgame = new WordGame(mysocket);
             WordGame wordgame = new WordGame();
 
