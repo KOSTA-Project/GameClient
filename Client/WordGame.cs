@@ -156,6 +156,7 @@ namespace Client
                     {
                         if (searchWord(word) == true)
                         {
+                            // 소켓에 내가 성공했다는걸 보내줘야 한다.
                             //mySocket.Send();
                             history.Add(wordInput.Text);
                             textBox1.Text = "5";
@@ -175,10 +176,13 @@ namespace Client
             int count = int.Parse(textBox1.Text);
             if (--count == 0)
             {
+                // 시간 초과로 인해 게임이 끝난다.
+                // 소켓에 담아서 보내줘야 한다.
                 timer1.Stop();
                 wordlist.Text += "-----Game Over-----\r\n";
                 wordInput.Enabled = false;
             }
+           
             textBox1.Text = count.ToString();
         }
 
