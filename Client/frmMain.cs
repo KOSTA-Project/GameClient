@@ -46,7 +46,22 @@ namespace Client
             숫자 야구 관련 Form을 불러오자.
             */
 
+            this.Visible = false;
+            // Word 게임 선택했다고 보내주기.
+
+            string chn = mySocket.LocalEndPoint.ToString().Split(':')[1];
+
+            packet = new PacketInfo(chn, uid, "1", "0", "");
             packet.setState("2");
+            string msg = packet.makePacket();
+
+            mySocket.Send(Encoding.Default.GetBytes(msg));
+
+            NBGame nbgame = new NBGame(mySocket, uid);
+            nbgame.ShowDialog();
+
+            this.Visible = true;
+
             //string msg = packet.makePacket();
             //mysocket.Send(Encoding.Default.GetBytes(msg));
 

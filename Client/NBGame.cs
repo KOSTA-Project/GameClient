@@ -8,6 +8,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows.Forms;
 using MetroFramework.Forms;
 
@@ -22,7 +23,7 @@ namespace Client
         string ses = null;
         string msg_room = null;     // "방번호/"
 
-
+        System.Timers.Timer t = null;
         Thread threadRead = null;
 
         int round_cnt = 0;
@@ -34,6 +35,7 @@ namespace Client
 
         int nb_len = 4;
         string query = "";
+        string qResult = "";
 
         delegate void cbAddText(string str);
 
@@ -60,7 +62,7 @@ namespace Client
 
             player = sock;
             uid = id;
-            ses = player.RemoteEndPoint.ToString().Split(':')[1];
+            ses = player.LocalEndPoint.ToString().Split(':')[1];
             pi = new PacketInfo(ses, id,"1","2","");
 
             threadRead = new Thread(ReadProcess);
@@ -68,16 +70,61 @@ namespace Client
             threadRead.Start();
 
             lbUser1.Text = $"ID: {id}"; // 괄호 안에 player소켓의 아이디
-            timer1.Interval = 1000;     // 1초마다 카운트다운
+            //timer1.Interval = 1000;     // 1초마다 카운트다운
+
+            t = new System.Timers.Timer();
+            t.Interval = 1000;
+            t.Elapsed += new ElapsedEventHandler(t_Elapsed);
+
         }
+
+        // timer_tick
+        public void t_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            sec--;
+            changeTimer($"남은 시간: {sec}초");
+            if (sec > 0) return;
+
+            t.Stop();
+
+            AddText($"=========== Round {round_cnt} ===========");
+
+            if (query == null)
+            {
+                AddText("입력된 질문이 없었습니다. 라운드하나 날림 ㅎ");
+            }
+            else
+            {
+                //string result = queryResult(query);
+                
+                AddText($"{query} >> {qResult}");   // 상대방 결과 반환과 동시에 해야할지
+            }
+            SendToServer($"{isWinner}/{round_cnt}");
+        }
+
+        delegate void CB(string str);
+        public void changeTimer(string str)
+        {
+            if (lbTimer.InvokeRequired)
+            {
+                CB cb = new CB(changeTimer);
+                Invoke(cb, new object[] { str });
+            }
+            else
+            {
+                lbTimer.Text = str;
+            }
+        }
+
 
         void ReadProcess()
         {
             while (true)
             {
-                if (isAlive(player))
+                int n = player.Available;
+                if (n>0)
                 {
-                    byte[] ba = new byte[player.Available];
+                    byte[] ba = new byte[n];
                     player.Receive(ba); //socket이름 player
                     string pkt = Encoding.Default.GetString(ba);
                     // 이부분 수정 필요----------------------------------------> 서버에서 받은 msg
@@ -90,6 +137,7 @@ namespace Client
                     if(msg_room==null) msg_room = pi.getRoom(pkt);
                     string msg = pi.getMessage(pkt);
 
+
                     if (msg.StartsWith("true") || msg.StartsWith("false"))     // 게임 도중인 경우
                     {
                         endGame(msg);
@@ -97,7 +145,8 @@ namespace Client
                     else
                     {
                         // gamestart받는 경우
-                        if (msg.StartsWith("gamestart")) startGame(msg);
+                        string numb = pi.getNumber(pkt);
+                        if (msg.StartsWith("gamestart")) startGame(numb);
                         nextRound();
                     }
                 }
@@ -107,11 +156,10 @@ namespace Client
         // 게임 시작 메서드
         void startGame(string msg)
         {
-            string[] sa = msg.Split('/');
-            lbUser2.Text = $"상대방 ID: {sa[1]}";
+            //lbUser2.Text = $"상대방 ID: {sa[1]}";
             isWinner = false;
 
-            nb_ans = int.Parse(sa[2]);
+            nb_ans = int.Parse(msg);
             round_cnt = 0;
             query = "";
 
@@ -136,7 +184,9 @@ namespace Client
             query = null;
             round_cnt++;
             sec = round_time / 1000;
-            timer1.Start();
+            tbQuery.Text = "";
+            t.Start();
+//            timer1.Start();
         }
 
         // 게임 끝 메서드
@@ -178,7 +228,7 @@ namespace Client
             }
             ball -= strike;
             if (strike == nb_len) isWinner = true;
-
+            qResult = $"{strike} strike, {ball} ball";
             return $"{strike} strike, {ball} ball";
         }
 
@@ -231,31 +281,10 @@ namespace Client
             if (player != null) player.Close();
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
-        {
-            sec--;
-            lbTimer.Text = $"남은 시간: {sec}초";
-            if (sec > 0) return;
-            timer1.Stop();
-
-            AddText($"=========== Round {round_cnt} ===========");
-
-            if (query == null)
-            {
-                AddText("입력된 질문이 없었습니다. 라운드하나 날림 ㅎ");
-            }
-            else
-            {
-                string result = queryResult(query);
-                tbQuery.Text = "";
-                AddText($"{query} >> {result}");   // 상대방 결과 반환과 동시에 해야할지
-            }
-            SendToServer($"{isWinner}/{round_cnt}");
-        }
 
         private void btnSubmit_Click(object sender, EventArgs e)
-        {
-            if (!timer1.Enabled) return;
+        { 
+            if (!t.Enabled) return;
             string msg = tbQuery.Text;
             if (!isValidQuery(msg))
             {
@@ -263,6 +292,7 @@ namespace Client
                 return;
             }
             query = msg;
+            qResult = queryResult(query);
         }
 
         private void btnClear_Click(object sender, EventArgs e)

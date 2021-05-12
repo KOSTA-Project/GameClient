@@ -132,6 +132,7 @@ namespace Client
             this.btnClear.TabIndex = 4;
             this.btnClear.Text = "Clear";
             this.btnClear.UseVisualStyleBackColor = true;
+            this.btnClear.Click += new System.EventHandler(this.btnClear_Click);
             // 
             // splitContainer2
             // 
@@ -183,6 +184,7 @@ namespace Client
             this.btnSubmit.TabIndex = 8;
             this.btnSubmit.Text = "질문 제출";
             this.btnSubmit.UseVisualStyleBackColor = true;
+            this.btnSubmit.Click += new System.EventHandler(this.btnSubmit_Click);
             // 
             // NBGame
             // 
@@ -192,6 +194,7 @@ namespace Client
             this.Controls.Add(this.splitContainer2);
             this.Name = "NBGame";
             this.Text = "NBGame";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmGame_FormClosing);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel1.PerformLayout();
             this.splitContainer1.Panel2.ResumeLayout(false);
