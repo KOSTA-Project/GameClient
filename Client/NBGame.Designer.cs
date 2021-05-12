@@ -37,7 +37,6 @@ namespace Client
             this.tbQuery = new System.Windows.Forms.TextBox();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.btnClear = new System.Windows.Forms.Button();
-            this.btnStart = new System.Windows.Forms.Button();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.lbTimer = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
@@ -134,15 +133,6 @@ namespace Client
             this.btnClear.Text = "Clear";
             this.btnClear.UseVisualStyleBackColor = true;
             // 
-            // btnStart
-            // 
-            this.btnStart.Location = new System.Drawing.Point(345, 30);
-            this.btnStart.Name = "btnStart";
-            this.btnStart.Size = new System.Drawing.Size(75, 23);
-            this.btnStart.TabIndex = 3;
-            this.btnStart.Text = "Ready";
-            this.btnStart.UseVisualStyleBackColor = true;
-            // 
             // splitContainer2
             // 
             this.splitContainer2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -158,7 +148,6 @@ namespace Client
             // 
             // splitContainer2.Panel2
             // 
-            this.splitContainer2.Panel2.Controls.Add(this.btnStart);
             this.splitContainer2.Panel2.Controls.Add(this.lbTimer);
             this.splitContainer2.Panel2.Controls.Add(this.label1);
             this.splitContainer2.Panel2.Controls.Add(this.btnSubmit);
@@ -227,7 +216,6 @@ namespace Client
         private System.Windows.Forms.TextBox tbQuery;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.Button btnClear;
-        private System.Windows.Forms.Button btnStart;
         private System.Windows.Forms.SplitContainer splitContainer2;
         private System.Windows.Forms.Label lbTimer;
         private System.Windows.Forms.Label label1;
