@@ -11,10 +11,11 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using MyLibrary;
 using static MyLibrary.mylib;
+using MetroFramework.Forms;
 
 namespace Client
 {
-    public partial class frmLogin : Form
+    public partial class frmLogin : MetroForm
     {
 
         Socket mySocket = null;
@@ -107,6 +108,11 @@ namespace Client
             {
                 button1_Click(sender, e);
             }
+        }
+
+        private void button2_Click_1(object sender, EventArgs e)
+        {
+            this.Close();
         }
     }
 }
