@@ -9,3 +9,7 @@ using C# of Web Application
 
 ## Server Program
 - DaemoProgram
+
+### 프로젝트 로드 방법
+- 패키지 관리자 콘손 -> Install-Package MetroFramework 입력
+- 모든 폼에 Metroform 
