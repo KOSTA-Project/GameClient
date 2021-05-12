@@ -61,7 +61,7 @@ namespace Client
 
             player = sock;
             uid = id;
-            ses = player.RemoteEndPoint.ToString().Split(':')[1];
+            ses = player.LocalEndPoint.ToString().Split(':')[1];
             pi = new PacketInfo(ses, id,"1","2","");
 
             threadRead = new Thread(ReadProcess);
@@ -120,9 +120,10 @@ namespace Client
         {
             while (true)
             {
-                if (isAlive(player))
+                int n = player.Available;
+                if (n>0)
                 {
-                    byte[] ba = new byte[player.Available];
+                    byte[] ba = new byte[n];
                     player.Receive(ba); //socket이름 player
                     string pkt = Encoding.Default.GetString(ba);
                     // 이부분 수정 필요----------------------------------------> 서버에서 받은 msg
@@ -135,6 +136,7 @@ namespace Client
                     if(msg_room==null) msg_room = pi.getRoom(pkt);
                     string msg = pi.getMessage(pkt);
 
+
                     if (msg.StartsWith("true") || msg.StartsWith("false"))     // 게임 도중인 경우
                     {
                         endGame(msg);
@@ -142,7 +144,8 @@ namespace Client
                     else
                     {
                         // gamestart받는 경우
-                        if (msg.StartsWith("gamestart")) startGame(msg);
+                        string numb = pi.getNumber(pkt);
+                        if (msg.StartsWith("gamestart")) startGame(numb);
                         nextRound();
                     }
                 }
@@ -152,11 +155,10 @@ namespace Client
         // 게임 시작 메서드
         void startGame(string msg)
         {
-            string[] sa = msg.Split('/');
             //lbUser2.Text = $"상대방 ID: {sa[1]}";
             isWinner = false;
 
-            nb_ans = int.Parse(sa[1]);
+            nb_ans = int.Parse(msg);
             round_cnt = 0;
             query = "";
 
@@ -289,7 +291,7 @@ namespace Client
                 return;
             }
             query = msg;
-            qResult = queryResult(msg);
+            qResult = queryResult(query);
         }
 
         private void btnClear_Click(object sender, EventArgs e)

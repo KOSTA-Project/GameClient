@@ -65,5 +65,11 @@ namespace Client
             string result = pkg.Split(',')[4].Split('/')[1];
             return result;
         }
+
+        public string getNumber(string pkg)
+        {
+            string result = pkg.Split(',')[4].Split('/')[2];
+            return result;
+        }
     }
 }
