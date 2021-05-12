@@ -153,10 +153,10 @@ namespace Client
         void startGame(string msg)
         {
             string[] sa = msg.Split('/');
-            lbUser2.Text = $"상대방 ID: {sa[1]}";
+            //lbUser2.Text = $"상대방 ID: {sa[1]}";
             isWinner = false;
 
-            nb_ans = int.Parse(sa[2]);
+            nb_ans = int.Parse(sa[1]);
             round_cnt = 0;
             query = "";
 
