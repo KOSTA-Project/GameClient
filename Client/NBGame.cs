@@ -8,6 +8,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows.Forms;
 
 namespace Client
@@ -21,7 +22,7 @@ namespace Client
         string ses = null;
         string msg_room = null;     // "방번호/"
 
-
+        System.Timers.Timer t = null;
         Thread threadRead = null;
 
         int round_cnt = 0;
@@ -33,6 +34,7 @@ namespace Client
 
         int nb_len = 4;
         string query = "";
+        string qResult = "";
 
         delegate void cbAddText(string str);
 
@@ -67,8 +69,52 @@ namespace Client
             threadRead.Start();
 
             lbUser1.Text = $"ID: {id}"; // 괄호 안에 player소켓의 아이디
-            timer1.Interval = 1000;     // 1초마다 카운트다운
+            //timer1.Interval = 1000;     // 1초마다 카운트다운
+
+            t = new System.Timers.Timer();
+            t.Interval = 1000;
+            t.Elapsed += new ElapsedEventHandler(t_Elapsed);
+
         }
+
+        // timer_tick
+        public void t_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            sec--;
+            changeTimer($"남은 시간: {sec}초");
+            if (sec > 0) return;
+
+            t.Stop();
+
+            AddText($"=========== Round {round_cnt} ===========");
+
+            if (query == null)
+            {
+                AddText("입력된 질문이 없었습니다. 라운드하나 날림 ㅎ");
+            }
+            else
+            {
+                //string result = queryResult(query);
+                
+                AddText($"{query} >> {qResult}");   // 상대방 결과 반환과 동시에 해야할지
+            }
+            SendToServer($"{isWinner}/{round_cnt}");
+        }
+
+        delegate void CB(string str);
+        public void changeTimer(string str)
+        {
+            if (lbTimer.InvokeRequired)
+            {
+                CB cb = new CB(changeTimer);
+                Invoke(cb, new object[] { str });
+            }
+            else
+            {
+                lbTimer.Text = str;
+            }
+        }
+
 
         void ReadProcess()
         {
@@ -135,7 +181,9 @@ namespace Client
             query = null;
             round_cnt++;
             sec = round_time / 1000;
-            timer1.Start();
+            tbQuery.Text = "";
+            t.Start();
+//            timer1.Start();
         }
 
         // 게임 끝 메서드
@@ -177,7 +225,7 @@ namespace Client
             }
             ball -= strike;
             if (strike == nb_len) isWinner = true;
-
+            qResult = $"{strike} strike, {ball} ball";
             return $"{strike} strike, {ball} ball";
         }
 
@@ -230,31 +278,10 @@ namespace Client
             if (player != null) player.Close();
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
-        {
-            sec--;
-            lbTimer.Text = $"남은 시간: {sec}초";
-            if (sec > 0) return;
-            timer1.Stop();
-
-            AddText($"=========== Round {round_cnt} ===========");
-
-            if (query == null)
-            {
-                AddText("입력된 질문이 없었습니다. 라운드하나 날림 ㅎ");
-            }
-            else
-            {
-                string result = queryResult(query);
-                tbQuery.Text = "";
-                AddText($"{query} >> {result}");   // 상대방 결과 반환과 동시에 해야할지
-            }
-            SendToServer($"{isWinner}/{round_cnt}");
-        }
 
         private void btnSubmit_Click(object sender, EventArgs e)
-        {
-            if (!timer1.Enabled) return;
+        { 
+            if (!t.Enabled) return;
             string msg = tbQuery.Text;
             if (!isValidQuery(msg))
             {
@@ -262,6 +289,7 @@ namespace Client
                 return;
             }
             query = msg;
+            qResult = queryResult(msg);
         }
 
         private void btnClear_Click(object sender, EventArgs e)
