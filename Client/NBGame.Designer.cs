@@ -164,7 +164,7 @@ namespace Client
             this.splitContainer2.Panel2.Controls.Add(this.btnSubmit);
             this.splitContainer2.Panel2.Controls.Add(this.tbQuery);
             this.splitContainer2.Panel2.Controls.Add(this.lbUser1);
-            this.splitContainer2.Size = new System.Drawing.Size(467, 396);
+            this.splitContainer2.Size = new System.Drawing.Size(467, 397);
             this.splitContainer2.SplitterDistance = 323;
             this.splitContainer2.TabIndex = 11;
             // 
@@ -199,7 +199,7 @@ namespace Client
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(469, 430);
+            this.ClientSize = new System.Drawing.Size(469, 431);
             this.Controls.Add(this.splitContainer2);
             this.Name = "NBGame";
             this.Text = "NBGame";

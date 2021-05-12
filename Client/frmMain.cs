@@ -9,10 +9,11 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using MetroFramework.Forms;
 
 namespace Client
 {
-    public partial class frmMain : Form
+    public partial class frmMain : MetroForm
     {
         Socket mySocket = null;
         PacketInfo packet = null;
