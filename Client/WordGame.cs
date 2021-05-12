@@ -33,6 +33,10 @@ namespace Client
         public WordGame()
         {
             InitializeComponent();
+            Socket mySocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            mySocket.Connect("192.168.0.85", 9000);
+            string chanel = mySocket.LocalEndPoint.ToString().Split(':')[1];
+            mySocket.Send(Encoding.Default.GetBytes($"{chanel},park,1,1,"));
             url = "https://krdict.korean.go.kr/api/search?key=";
             apikey = "EBB6D3290D88C645CF1452F7DA3229D0";
             type = "&part=word&pos=1&q=";
