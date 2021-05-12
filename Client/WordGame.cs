@@ -12,6 +12,7 @@ using System.Xml;
 using System.Net;
 using System.IO;
 using System.Threading;
+using System.Timers;
 
 namespace Client
 {
@@ -30,6 +31,8 @@ namespace Client
         string uid = null;
 
         Thread socketThread = null;
+
+        System.Timers.Timer t = null;
 
         public WordGame()
         {
@@ -50,6 +53,7 @@ namespace Client
         public WordGame(Socket ss, string uid)
         {
             InitializeComponent();
+            
             mySocket = ss;
             string sess = mySocket.LocalEndPoint.ToString().Split(':')[1];
             this.uid = uid;
@@ -61,8 +65,46 @@ namespace Client
             packet = new PacketInfo(sess,uid,"1","1","");
             socketThread = new Thread(socketListener);
             socketThread.Start();
-            
+
+            t = new System.Timers.Timer();
+            t.Interval = 1000;
+            t.Elapsed += new ElapsedEventHandler(t_Elapsed);
+
+
         }
+        delegate void CB(string str);
+        public void changeTimer(string str)
+        {
+            if (textBox1.InvokeRequired)
+            {
+                CB cb = new CB(changeTimer);
+                Invoke(cb, new object[] { str });
+            }
+            else
+            {
+                textBox1.Text = str;
+            }
+        }
+
+        public void t_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            int count = int.Parse(textBox1.Text);
+            if (--count == 0)
+            {
+                // 시간 초과로 인해 게임이 끝난다.
+                // 소켓에 담아서 보내줘야 한다.
+                //timer1.Stop();
+                t.Stop();
+
+                //wordlist.Text += "-----Game Over-----\r\n";
+                MessageBox.Show("당신이 패배했습니다.");
+                //wordInput.Enabled = false;
+                //this.Close();
+            }
+            string c = count.ToString();
+            changeTimer(c);
+        }
+
 
         public void socketListener()
         {
@@ -76,6 +118,7 @@ namespace Client
                         byte[] bArr = new byte[n];
                         mySocket.Receive(bArr);
                         string pkg = Encoding.Default.GetString(bArr);
+
                         if (pkg.Contains(','))
                         {
                             string[] msg = pkg.Split(',');
@@ -84,11 +127,13 @@ namespace Client
                         
                         if (pkg == "gamestart")
                         {
-                            timer1.Start();
+                            //timer1.Enabled = true;
+                            //timer1.Start();
+                            t.Start();
                         }
                         if (pkg == "lose")
                         {
-                            timer1.Stop();
+                            t.Stop();
                             MessageBox.Show("당신이 이겼습니다.");
                         }
 
@@ -215,5 +260,7 @@ namespace Client
         {
             socketThread.Abort();
         }
+
+
     }
 }

@@ -54,6 +54,12 @@ namespace Client
             return result;
         }
 
+        public string getRoom(string pkg)
+        {
+            string result = pkg.Split(',')[4].Split('/')[0] + "/";
+            return result;
+        }
+
         public string getMessage(string pkg)
         {
             string result = pkg.Split(',')[4].Split('/')[1];

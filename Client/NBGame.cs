@@ -18,6 +18,10 @@ namespace Client
 
         Socket player = null;
         string uid = null;
+        PacketInfo pi = null;
+        string ses = null;
+        string msg_room = null;     // "방번호/"
+
 
         Thread threadRead = null;
 
@@ -52,16 +56,18 @@ namespace Client
 
         public NBGame(Socket sock, string id)
         {
+            InitializeComponent();
+
             player = sock;
             uid = id;
+            ses = player.RemoteEndPoint.ToString().Split(':')[1];
+            pi = new PacketInfo(ses, id,"1","2","");
 
             threadRead = new Thread(ReadProcess);
             threadRead.IsBackground = true;
             threadRead.Start();
 
-            //packetinfo 만들어주세요. 
-
-            //lbUser1.Text = $"ID: {}"; // 괄호 안에 player소켓의 아이디
+            lbUser1.Text = $"ID: {id}"; // 괄호 안에 player소켓의 아이디
             timer1.Interval = 1000;     // 1초마다 카운트다운
         }
 
@@ -73,7 +79,7 @@ namespace Client
                 {
                     byte[] ba = new byte[player.Available];
                     player.Receive(ba); //socket이름 player
-
+                    string pkt = Encoding.Default.GetString(ba);
                     // 이부분 수정 필요----------------------------------------> 서버에서 받은 msg
                     // 이부분 수정 필요----------------------------게임 시작 시작 시, (1) 클->서버 "gamestart"
                     // 이부분 수정 필요----------------------------게임 시작 시작 시, (2) 서버->클 "gamestart/상대id/문제정답"
@@ -81,11 +87,16 @@ namespace Client
                     // 이부분 수정 필요-------게임 중간, 서버는 두 클의 isWinner가 true인거 하나라도 있으면
                     // 서버->클 "gameend/true(false)"-> 상대방isWinner인지 패킷 전송  / isWinner=true인 클에게 money추가
                     // 이부분 수정 필요-------게임 중간, 두 클 모두 isWinner=false면 "continue"
+                    if(msg_room==null) msg_room = pi.getRoom(pkt);
+                    string msg = pi.getMessage(pkt);
 
-                    string msg = Encoding.Default.GetString(ba);
-                    if (msg.StartsWith("gameend")) endGame(msg);
+                    if (msg.StartsWith("true") || msg.StartsWith("false"))     // 게임 도중인 경우
+                    {
+                        endGame(msg);
+                    }
                     else
                     {
+                        // gamestart받는 경우
                         if (msg.StartsWith("gamestart")) startGame(msg);
                         nextRound();
                     }
@@ -94,7 +105,7 @@ namespace Client
         }
 
         // 게임 시작 메서드
-        void startGame(string msg) //msg = 
+        void startGame(string msg)
         {
             string[] sa = msg.Split('/');
             lbUser2.Text = $"상대방 ID: {sa[1]}";
@@ -131,14 +142,17 @@ namespace Client
         // 게임 끝 메서드
         void endGame(string msg)
         {
-            // 상대방 이김
 
-            if (msg.Split('/')[1] == "true")
+            if (msg.StartsWith("true")) // 상대방이 이긴경우
             {
-                if (isWinner) tbMain.Text = "비김";
-                else tbMain.Text = "짐";
+                if (isWinner) AddText("비김");
+                else AddText("짐");
             }
-            else tbMain.Text = "이김";
+            else
+            {
+                if (isWinner) AddText("이김");
+                else nextRound();
+            }
         }
 
         // nb 쿼리 결과
@@ -183,7 +197,8 @@ namespace Client
         // 서버로 정보 전송
         void SendToServer(string msg)
         {
-            player.Send(Encoding.Default.GetBytes(msg));
+            pi.setMessage(msg_room+msg);
+            player.Send(Encoding.Default.GetBytes(pi.makePacket()));
         }
 
         // 소켓 연결 체크
@@ -216,13 +231,6 @@ namespace Client
             if (player != null) player.Close();
         }
 
-        // 게임 준비 완료
-        private void btnStart_Click(object sender, EventArgs e)
-        {
-            string msg = "gamestart";
-            SendToServer(msg);
-        }
-
         private void timer1_Tick(object sender, EventArgs e)
         {
             sec--;
@@ -242,12 +250,12 @@ namespace Client
                 tbQuery.Text = "";
                 AddText($"{query} >> {result}");   // 상대방 결과 반환과 동시에 해야할지
             }
-
             SendToServer($"{isWinner}/{round_cnt}");
         }
 
         private void btnSubmit_Click(object sender, EventArgs e)
         {
+            if (!timer1.Enabled) return;
             string msg = tbQuery.Text;
             if (!isValidQuery(msg))
             {
