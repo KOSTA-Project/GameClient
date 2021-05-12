@@ -14,27 +14,27 @@ namespace Client
 {
     public partial class frmMain : Form
     {
-        Socket mysocket = null;
+        Socket mySocket = null;
         PacketInfo packet = null;
+        string uid = null;
 
         public frmMain()
         {
             InitializeComponent();
         }
 
-        public frmMain(Socket sock, string id)
+        public frmMain(Socket socket, string id)
         {
             InitializeComponent();
-            mysocket = sock;
-            string s_num = mysocket.LocalEndPoint.ToString().Split(':')[1];
-            packet = new PacketInfo(s_num,id,"1","0","");
+            mySocket = socket;
+            uid = id;
+            tbShow.Text = $"{uid}님 환영합니다. 게임을 선택해 주세요.";
         }
+
 
 
         private void frmMain_Load(object sender, EventArgs e)
         {
-            frmLogin login = new frmLogin();
-            login.ShowDialog();
 
         }
 
@@ -45,7 +45,7 @@ namespace Client
             숫자 야구 관련 Form을 불러오자.
             */
 
-            //packet.setState("2");
+            packet.setState("2");
             //string msg = packet.makePacket();
             //mysocket.Send(Encoding.Default.GetBytes(msg));
 
@@ -61,12 +61,16 @@ namespace Client
 
             this.Visible = false;
             // Word 게임 선택했다고 보내주기.
-            //packet.setState("1");
-            //string msg = packet.makePacket();
-            //mysocket.Send(Encoding.Default.GetBytes(msg));
 
-           // WordGame wordgame = new WordGame(mysocket);
-            WordGame wordgame = new WordGame();
+            string chn = mySocket.LocalEndPoint.ToString().Split(':')[1];
+
+            packet = new PacketInfo(chn, uid, "1", "0", "");
+            packet.setState("1");
+            string msg = packet.makePacket();
+
+            mySocket.Send(Encoding.Default.GetBytes(msg));
+
+            WordGame wordgame = new WordGame(mySocket, uid);
 
             wordgame.ShowDialog();
 
@@ -75,8 +79,8 @@ namespace Client
 
         private void logOutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            mysocket.Shutdown(SocketShutdown.Both);
-            mysocket.Close();
+            mySocket.Shutdown(SocketShutdown.Both);
+            mySocket.Close();
             //Login page로 돌아가기.
 
         }

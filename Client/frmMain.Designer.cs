@@ -35,6 +35,7 @@ namespace Client
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.사용자정보ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.logOutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tbShow = new System.Windows.Forms.TextBox();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -50,7 +51,7 @@ namespace Client
             // 
             this.btn_NB.Location = new System.Drawing.Point(80, 158);
             this.btn_NB.Name = "btn_NB";
-            this.btn_NB.Size = new System.Drawing.Size(75, 23);
+            this.btn_NB.Size = new System.Drawing.Size(79, 58);
             this.btn_NB.TabIndex = 1;
             this.btn_NB.Text = "숫자 야구";
             this.btn_NB.UseVisualStyleBackColor = true;
@@ -58,9 +59,9 @@ namespace Client
             // 
             // btn_Word
             // 
-            this.btn_Word.Location = new System.Drawing.Point(252, 158);
+            this.btn_Word.Location = new System.Drawing.Point(244, 157);
             this.btn_Word.Name = "btn_Word";
-            this.btn_Word.Size = new System.Drawing.Size(75, 23);
+            this.btn_Word.Size = new System.Drawing.Size(79, 60);
             this.btn_Word.TabIndex = 2;
             this.btn_Word.Text = "끝말잇기";
             this.btn_Word.UseVisualStyleBackColor = true;
@@ -87,22 +88,33 @@ namespace Client
             // logOutToolStripMenuItem
             // 
             this.logOutToolStripMenuItem.Name = "logOutToolStripMenuItem";
-            this.logOutToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.logOutToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
             this.logOutToolStripMenuItem.Text = "Log out";
             this.logOutToolStripMenuItem.Click += new System.EventHandler(this.logOutToolStripMenuItem_Click);
+            // 
+            // tbShow
+            // 
+            this.tbShow.BackColor = System.Drawing.SystemColors.Control;
+            this.tbShow.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.tbShow.Location = new System.Drawing.Point(64, 74);
+            this.tbShow.Name = "tbShow";
+            this.tbShow.Size = new System.Drawing.Size(277, 14);
+            this.tbShow.TabIndex = 4;
+            this.tbShow.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(413, 445);
+            this.Controls.Add(this.tbShow);
             this.Controls.Add(this.btn_Word);
             this.Controls.Add(this.btn_NB);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "frmMain";
-            this.Text = "Form1";
+            this.Text = "Game";
             this.Load += new System.EventHandler(this.frmMain_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
@@ -119,6 +131,7 @@ namespace Client
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem 사용자정보ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem logOutToolStripMenuItem;
+        private System.Windows.Forms.TextBox tbShow;
     }
 }
 

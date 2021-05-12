@@ -27,32 +27,40 @@ namespace Client
         Socket mySocket = null;
 
         PacketInfo packet = null;
+        string uid = null;
 
         Thread socketThread = null;
 
         public WordGame()
         {
             InitializeComponent();
-            Socket mySocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            mySocket.Connect("192.168.0.85", 9000);
-            string chanel = mySocket.LocalEndPoint.ToString().Split(':')[1];
-            mySocket.Send(Encoding.Default.GetBytes($"{chanel},park,1,1,"));
-            url = "https://krdict.korean.go.kr/api/search?key=";
-            apikey = "EBB6D3290D88C645CF1452F7DA3229D0";
-            type = "&part=word&pos=1&q=";
-            timer1.Start();
+            //Socket mySocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            //mySocket.Connect("192.168.0.85", 9000);
+            //string chanel = mySocket.LocalEndPoint.ToString().Split(':')[1];
+            //mySocket.Send(Encoding.Default.GetBytes($"{chanel},park,1,1,"));
+            //url = "https://krdict.korean.go.kr/api/search?key=";
+            //apikey = "EBB6D3290D88C645CF1452F7DA3229D0";
+            //type = "&part=word&pos=1&q=";
+            //socketThread = new Thread(socketListener);
+            //socketThread.Start();
+
+            //timer1.Start();
         }
 
-        public WordGame(Socket ss)
+        public WordGame(Socket ss, string uid)
         {
             InitializeComponent();
             mySocket = ss;
+            string sess = mySocket.LocalEndPoint.ToString().Split(':')[1];
+            this.uid = uid;
             //packet = pi;
             url = "https://krdict.korean.go.kr/api/search?key=";
             apikey = "EBB6D3290D88C645CF1452F7DA3229D0";
             type = "&part=word&pos=1&q=";
 
+            packet = new PacketInfo(sess,uid,"1","1","");
             socketThread = new Thread(socketListener);
+            socketThread.Start();
             
         }
 
@@ -68,10 +76,22 @@ namespace Client
                         byte[] bArr = new byte[n];
                         mySocket.Receive(bArr);
                         string pkg = Encoding.Default.GetString(bArr);
+                        if (pkg.Contains(','))
+                        {
+                            string[] msg = pkg.Split(',');
+                            packet = new PacketInfo(msg[0], msg[1], msg[2], msg[3], msg[4]);
+                        }
+                        
                         if (pkg == "gamestart")
                         {
                             timer1.Start();
                         }
+                        if (pkg == "lose")
+                        {
+                            timer1.Stop();
+                            MessageBox.Show("당신이 이겼습니다.");
+                        }
+
 
                     }
                 }
@@ -184,6 +204,7 @@ namespace Client
                 // 소켓에 담아서 보내줘야 한다.
                 timer1.Stop();
                 wordlist.Text += "-----Game Over-----\r\n";
+                MessageBox.Show("당신이 패배했습니다.");
                 wordInput.Enabled = false;
             }
            
@@ -192,6 +213,7 @@ namespace Client
 
         private void WordGame_FormClosed(object sender, FormClosedEventArgs e)
         {
+            socketThread.Abort();
         }
     }
 }

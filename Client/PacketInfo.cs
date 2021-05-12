@@ -48,6 +48,12 @@ namespace Client
             this.message = target;
         }
 
+        public string getID(string pkg)
+        {
+            string result = pkg.Split(',')[1];
+            return result;
+        }
+
         public string getMessage(string pkg)
         {
             string result = pkg.Split(',')[4].Split('/')[1];
