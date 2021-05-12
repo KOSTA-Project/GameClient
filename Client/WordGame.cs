@@ -123,15 +123,16 @@ namespace Client
                         {
                             string[] msg = pkg.Split(',');
                             packet = new PacketInfo(msg[0], msg[1], msg[2], msg[3], msg[4]);
+
                         }
-                        
-                        if (pkg == "gamestart")
+                        string str = packet.getMessage(pkg);
+                        if (str == "gamestart")
                         {
                             //timer1.Enabled = true;
                             //timer1.Start();
                             t.Start();
                         }
-                        if (pkg == "lose")
+                        if (str == "lose")
                         {
                             t.Stop();
                             MessageBox.Show("당신이 이겼습니다.");

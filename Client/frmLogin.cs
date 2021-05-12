@@ -52,8 +52,6 @@ namespace Client
                         this.Visible = false;
                         frmMain fmain = new frmMain(mySocket, uid);
                         fmain.ShowDialog();
-                        
-
                     }
                 }
                 else

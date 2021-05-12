@@ -76,7 +76,6 @@ namespace Client
             t.Elapsed += new ElapsedEventHandler(t_Elapsed);
 
         }
-
         // timer_tick
         public void t_Elapsed(object sender, ElapsedEventArgs e)
         {
@@ -98,8 +97,17 @@ namespace Client
                 
                 AddText($"{query} >> {qResult}");   // 상대방 결과 반환과 동시에 해야할지
             }
+            // 
             SendToServer($"{isWinner}/{round_cnt}");
         }
+
+
+        void SendToServer(string msg)
+        {
+            pi.setMessage(msg_room + msg);
+            player.Send(Encoding.Default.GetBytes(pi.makePacket()));
+        }
+
 
         delegate void CB(string str);
         public void changeTimer(string str)
@@ -114,7 +122,6 @@ namespace Client
                 lbTimer.Text = str;
             }
         }
-
 
         void ReadProcess()
         {
@@ -135,7 +142,6 @@ namespace Client
                     // 이부분 수정 필요-------게임 중간, 두 클 모두 isWinner=false면 "continue"
                     if(msg_room==null) msg_room = pi.getRoom(pkt);
                     string msg = pi.getMessage(pkt);
-
 
                     if (msg.StartsWith("true") || msg.StartsWith("false"))     // 게임 도중인 경우
                     {
@@ -191,7 +197,6 @@ namespace Client
         // 게임 끝 메서드
         void endGame(string msg)
         {
-
             if (msg.StartsWith("true")) // 상대방이 이긴경우
             {
                 if (isWinner) AddText("비김");
@@ -227,6 +232,7 @@ namespace Client
             }
             ball -= strike;
             if (strike == nb_len) isWinner = true;
+
             qResult = $"{strike} strike, {ball} ball";
             return $"{strike} strike, {ball} ball";
         }
@@ -243,12 +249,8 @@ namespace Client
 
         }
 
-        // 서버로 정보 전송
-        void SendToServer(string msg)
-        {
-            pi.setMessage(msg_room+msg);
-            player.Send(Encoding.Default.GetBytes(pi.makePacket()));
-        }
+        //delegate void cbSend(string msg);
+
 
         // 소켓 연결 체크
         bool isAlive(Socket ss)
